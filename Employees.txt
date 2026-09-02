@@ -1,0 +1,74 @@
+SELECT * FROM Employees
+SELECT * FROM History
+
+--	1. Get empid, firstname, lastname, country, region, city of all employees from USA.
+SELECT BusinessEntityID,
+FirstName + ' ' + MiddleName + ' ' + LastName AS [Full name],
+CountryRegionName,StateProvinceName,City
+FROM Employees
+
+-- 2. Get the number of employees for each specialty.
+SELECT  JobTitle,COUNT(*) AS EmployeeCount
+FROM Employees
+GROUP BY JobTitle
+
+-- 3. Count the number of people for each name.
+SELECT FirstName, COUNT(*)
+FROM Employees
+GROUP BY FirstName
+
+-- 4. Get the most common name.
+SELECT TOP 1 FirstName,COUNT(FirstName) AS NameCount
+FROM Employees
+GROUP BY FirstName
+ORDER BY NameCount DESC
+
+-- 5. Get the least common name.
+SELECT TOP 1 FirstName, COUNT(FirstName) AS NameCount
+FROM Employees
+GROUP BY FirstName
+ORDER BY NameCount
+
+-- 6. Get the top 5 cities where the most workers are.
+SELECT TOP 5 City, COUNT(BusinessEntityID) AS EmployeeCount
+FROM Employees
+GROUP BY City
+ORDER BY EmployeeCount DESC
+
+-- 7. Get the top 5 cities, which have the most unique specialties. 
+SELECT TOP 5 City, COUNT(DISTINCT JobTitle) AS UniqueSpecialtiesCount
+FROM Employees
+GROUP BY City
+ORDER BY UniqueSpecialtiesCount DESC
+
+-- 8. Issue mailing addresses for emailing to all employees who started working on 1/01/2012.
+SELECT EmailAddress, StartDate
+FROM Employees
+WHERE StartDate >= '2012-01-01'
+
+-- 9. Issue statistics in what year how many employees were employed.
+SELECT YEAR(StartDate) AS EmploymentYear,
+COUNT(BusinessEntityID) AS EmployeeCount
+FROM Employees
+GROUP BY YEAR(StartDate)
+
+-- 10. Issue statistics in which year how many workers in which countries were employed.
+SELECT CountryRegionName, COUNT(BusinessEntityID) AS EmployeeCount, 
+YEAR(StartDate) AS StartDate
+FROM Employees
+GROUP BY CountryRegionName, YEAR(StartDate)
+ORDER BY EmployeeCount DESC
+
+-- 12. Issue statistics on how many employees in which year they left. 
+SELECT YEAR(H.EndDate) AS EndDate, COUNT(E.BusinessEntityID) AS EmployeeCount
+FROM Employees E
+JOIN History H ON E.BusinessEntityID = H.BusinessEntityID
+WHERE YEAR(H.EndDate) IS NOT NULL
+GROUP BY YEAR(H.EndDate)
+ORDER BY EmployeeCount
+
+-- 13. Issue the number of employees who have worked less than a year.
+SELECT COUNT(*) AS EmployeeCount
+FROM Employees E
+JOIN History H ON E.BusinessEntityID = H.BusinessEntityID
+WHERE DATEDIFF(YEAR,H.StartDate,H.EndDate) < 1
